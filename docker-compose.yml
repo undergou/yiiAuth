@@ -1,0 +1,28 @@
+version: '2'
+services:
+  php:
+    image: yiisoftware/yii2-php:7.1-apache
+    volumes:
+      - ~/.composer-docker/cache:/root/.composer/cache:delegated
+      - ./:/app:delegated
+    ports:
+      - '8001:80'
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+    volumes:
+      - .docker/mysql:/var/lib/mysql
+    ports:
+      - "3666:3306"
+
+  php-cli:
+    build: ./.docker/php-cli
+    volumes:
+      - ./:/var/www/symshop.loc
+      - .docker/php-cli/php.ini:/usr/local/etc/php/php.ini
+    tty: true
