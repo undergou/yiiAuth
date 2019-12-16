@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Exception;
 use yii\base\Model;
+use yii\helpers\Url;
 
 /**
  * @property User|null $user This property is read-only.
@@ -96,17 +97,20 @@ class RegisterForm extends Model
 
         $user = new User(['scenario' => User::SCENARIO_REGISTER]);
         $user->loadDefaultValues();
+        $string = Yii::$app->security->generateRandomString();
         $user->username = $this->username;
         $user->displayname = $this->displayName;
         $user->email = $this->email;
         $user->setPassword($this->password);
         $user->generateResetKey();
         $user->generateAuthKey();
+        $link = sprintf('%s/login?rec=%s', Url::base('http'), $string);
+        $text = sprintf('Link: <a href="%s">%s</a>', $link, $link);
         Yii::$app->mailer->compose()
             ->setFrom('lamer_10@mail.ru')
             ->setTo($this->email)
-            ->setSubject('CONFIRM!!')
-            ->setTextBody("HELLO MOTHFCU!")
+            ->setSubject("Confirm!")
+            ->setHtmlBody($text, "text/html")
             ->send();
         $this->_user = $user->save();
 
